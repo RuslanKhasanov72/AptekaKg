@@ -40,10 +40,15 @@ while lastpage!=None:
     for link in links:
         linksurl.append(link.get("href"))
         linksname.append(link.find('h2', class_='woocommerce-loop-product__title'))
-        linksavailable.append(link.find('span', class_='in-stock'))
+        stock=link.find('span', class_='in-stock')
+        print(stock)
+        if(stock==None):
+            linksavailable.append(link.find('span', class_='out-of-stock'))
+        else:
+            linksavailable.append(stock)
         linkprice.append(link.find('span', class_='woocommerce-Price-amount amount'))
         linksimages.append(link.find('img',class_='woocommerce-placeholder wp-post-image'))
-
+    print(integer)
 
     for i, link in enumerate(linksname):
         Medicines = Base.classes.Medicines
@@ -53,6 +58,7 @@ while lastpage!=None:
         name = linksname[i].text  # извлекаем наименование из блока со ссылкой
         availablebool = False
         available = linksavailable[i].text
+        print(available)
         if (available == "В наличии"):
             availablebool = True
         else:
@@ -93,6 +99,7 @@ while lastpage!=None:
             print('update')
             med_to_update = db_session.query(Medicines).filter_by(Name=link.text, FranchiseId=5).first()
             med_to_update.Available = availablebool
+            print(availablebool)
             med_to_update.Price = price
             db_session.commit()
         print(f'{i}: {urlreal}')

@@ -1,6 +1,9 @@
 using AptekaKg.Models;
+using AptekaKg.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Linq;
 
 namespace AptekaKg.Controllers
 {
@@ -8,14 +11,33 @@ namespace AptekaKg.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private UsersContext _db;
+
+        public HomeController(UsersContext db, ILogger<HomeController> logger)
         {
+            _db = db;
             _logger = logger;
         }
 
-        public IActionResult Index()
+
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View();
+			int pageSize = 12;
+            var categorylist=_db.Categories.ToList();
+            IQueryable<Medicine> medpages = _db.Medicines;
+            var subcategorylist=_db.SubCategories.ToList();
+            var count = await medpages.CountAsync();
+			var items = await medpages.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+			PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
+			HomeConModel model = new HomeConModel
+            {
+                Categories = categorylist,
+                SubCategories = subcategorylist,
+                PageViewModel= pageViewModel,
+                Medicines=items
+                
+            };
+            return View(model);
         }
 
         public IActionResult Privacy()

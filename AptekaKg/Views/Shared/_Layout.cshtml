@@ -1,4 +1,22 @@
 ﻿<!DOCTYPE html>
+<style>
+	#inputlog {
+		border: none;
+		background: none;
+		font-size:12px;
+		color:#ffff;
+		cursor: pointer;
+		padding: 0;
+		margin: 0;
+		outline: none;
+	}
+
+		#inputlog:focus {
+			outline: none;
+			color: #9ff
+
+		}
+</style>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,42 +25,116 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AptekaKg.styles.css" asp-append-version="true" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="Gifty Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+	<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+	<link href="~/css/bootstrap.css" rel='stylesheet' type='text/css' />
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<!-- Custom Theme files -->
+	<link href="~/css/style.css" rel='stylesheet' type='text/css' />
+	<link rel="stylesheet" href="~/css/jquery.countdown.css" />
+	<!-- Custom Theme files -->
+	<!--webfont-->
+	<link href='http://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700,800,900' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="~/js/jquery-1.11.1.min.js"></script>
+	<!-- dropdown -->
+	<script src="~/js/jquery.easydropdown.js"></script>
+	<!-- start menu -->
+	<link href="~/css/megamenu.css" rel="stylesheet" type="text/css" media="all" />
+	<script type="text/javascript" src="~/js/megamenu.js"></script>
+	<script>$(document).ready(function () { $(".megamenu").megamenu(); });</script>
+	<link rel="stylesheet" href="~/css/etalage.css">
+	<script src="~/js/responsiveslides.min.js"></script>
+	<script>
+		$(function () {
+			$("#slider").responsiveSlides({
+				auto: true,
+				nav: false,
+				speed: 500,
+				namespace: "callbacks",
+				pager: true,
+			});
+		});
+	</script>
+	<script src="~/js/jquery.countdown.js"></script>
+	<script src="~/js/script.js"></script>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AptekaKg</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+		<div class="header_top">
+			<div class="container">
+				<div class="header_top-box">
+					<div class="cssmenu">
+						<ul>
+							 @if (User.Identity.IsAuthenticated)
+                        {
+							<li class="active"><a href="login.html">Аккаунт</a></li>
+								<li>
+									<form method="post" asp-controller="Account" asp-action="LogOff">
+									<input id="inputlog" type="submit" value="Выход" />
+								</form>
+									</li>
+						}
+						else{
+							<li><a href="wishlist.html">Wishlist</a></li>
+								<li><a asp-controller="Account" asp-action="Login">Логин</a></li>
+							<li><a asp-controller="Account" asp-action="Register">Регистрация</a></li>
+						}
+						</ul>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+			</div>
+		</div>
+		<div class="header_bottom">
+			<div class="container">
+				<div class="header_bottom-box">
+					<div class="header_bottom_left">
+						<div class="logo">
+							<a asp-controller="Home" asp-action="Index"><img src="~/images/logofinal.png" style="width:120px;height:100px" alt="" /></a>
+						</div>
+						<ul class="clock">
+							<i class="clock_icon"> </i>
+							<li class="clock_desc">Justo 24/h</li>
+						</ul>
+						<div class="clearfix"> </div>
+					</div>
+					<div class="header_bottom_right">
+						<div class="search">
+							<input type="text" value="Наименование лекарства" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Наименование лекарства';}">
+							<input type="submit" value="">
+						</div>
+						<ul class="bag">
+							<a asp-controller="Account" asp-action="Bascket"><i class="bag_left"> </i></a>
+							<div class="clearfix"> </div>
+						</ul>
+					</div>
+					<div class="clearfix"> </div>
+				</div>
+			</div>
+		</div>
     </header>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - AptekaKg - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+		<img src="images/pay.png" class="img-responsive" alt="" />
+			<ul class="footer_nav">
+				<li><a href="#">Home</a></li>
+				<li><a href="#">Blog</a></li>
+				<li><a href="#">Shop</a></li>
+				<li><a href="#">Media</a></li>
+				<li><a href="#">Features</a></li>
+				<li><a href="#">About Us</a></li>
+				<li><a href="contact.html">Contact Us</a></li>
+			</ul>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

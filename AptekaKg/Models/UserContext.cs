@@ -12,8 +12,9 @@ namespace AptekaKg.Models
         public DbSet<Pharmacy> Pharmacies { get; set; }
         public DbSet<Medicine> Medicines { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderMedicine> OrderMedicines {  get; set; } 
-        public UsersContext(DbContextOptions<UsersContext> options)
+        public DbSet<OrderMedicine> OrderMedicines {  get; set; }
+		public DbSet<Basket> Baskets { get; set; }
+		public UsersContext(DbContextOptions<UsersContext> options)
              : base(options)
         {
         }

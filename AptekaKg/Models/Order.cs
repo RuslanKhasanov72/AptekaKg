@@ -6,5 +6,7 @@
         public User User { get; set; }
         public string UserId { get; set; }
         public int Price { get; set; }
+        public DateTime Created { get; set; }
+
     }
 }

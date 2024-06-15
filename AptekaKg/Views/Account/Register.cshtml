@@ -1,0 +1,111 @@
+﻿@model AptekaKg.Models.RegisterViewModel
+@{
+	ViewData["Title"] = "Register Page";
+	Layout = "_Layout";
+}
+<body>
+	<div class="menu">
+		<div class="container">
+			<div class="menu_box">
+				<ul class="megamenu skyblue">
+					@foreach (var cat in Model.Categories)
+					{
+						<li>
+							<a class="color10" asp-controller="Category" asp-action="Index" asp-route-catid="@cat.Id" style=" width:120px;text-align:center;">@cat.Name</a>
+							<div class="megapanel">
+								<div class="row">
+									@{
+										var integer = 0;
+										var count = Model.SubCategories.Where(x => x.CategoryId == cat.Id).Count();
+										double ans = count / 8;
+										ans = Math.Round(ans);
+										var catlist = Model.SubCategories.Where(x => x.CategoryId == cat.Id).ToArray();
+									}
+									@for (int i = 0; i < ans; i++)
+									{
+										<div class="col1">
+											<div class="h_nav">
+												<ul>
+													@for (int k = i * 8; k <= (i * 8 + 8) - 1; k++)
+													{
+														<li><a asp-controller="Category" asp-action="Index" asp-route-subcatid="@catlist[k].Id">@catlist[k].Name</a></li>
+													}
+												</ul>
+											</div>
+										</div>
+
+									}
+								</div>
+							</div>
+						</li>
+					}
+					<div class="clearfix"> </div>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="men">
+		<div class="container">
+			<div class="col-md-12 register">
+				<form method="post" asp-controller="Account" asp-action="Register">
+					<div class="register-top-grid">
+						<h3>Введите данные:</h3>
+						<div>
+							<span>Номер телефона</span>
+							<input asp-for="Phone">
+							<span asp-validation-for="Phone"></span>
+						</div>
+						<div>
+							<span>Адрес</span>
+							<input asp-for="Adress">
+							<span asp-validation-for="Adress"></span>
+						</div>
+						<div>
+							<span>Email</span>
+							<input asp-for="Email">
+							<span asp-validation-for="Email"></span>
+						</div>
+						<div class="clearfix"> </div>
+						<a class="news-letter" href="#">
+						</a>
+					</div>
+					<div class="register-bottom-grid">
+						<h3>Введите пароль:</h3>
+						<div>
+							<span>Пароль</span>
+							<input asp-for="Password">
+							<span asp-validation-for="Password"></span>
+						</div>
+						<div>
+							<span>Подтверждение пароля</span>
+							<input asp-for="PasswordConfirm">
+							<span asp-validation-for="PasswordConfirm"></span>
+						</div>
+						<div class="clearfix"> </div>
+					</div>
+				<div class="clearfix"> </div>
+				<div class="register-but">
+						<input class="account-btn" type="submit" value="Регистрация">
+						<div class="clearfix"> </div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="footer">
+		<div class="container">
+			<img src="images/pay.png" class="img-responsive" alt="" />
+			<ul class="footer_nav">
+				<li><a href="#">Home</a></li>
+				<li><a href="#">Blog</a></li>
+				<li><a href="#">Shop</a></li>
+				<li><a href="#">Media</a></li>
+				<li><a href="#">Features</a></li>
+				<li><a href="#">About Us</a></li>
+				<li><a href="contact.html">Contact Us</a></li>
+			</ul>
+			<p class="copy">Copyright&copy; 2015 Template by <a href="http://w3layouts.com" target="_blank"> w3layouts</a></p>
+		</div>
+	</div>
+</body>
+</html>	

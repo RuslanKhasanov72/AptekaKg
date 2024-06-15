@@ -1,0 +1,91 @@
+﻿@model AptekaKg.Models.LoginViewModel
+@{
+	ViewData["Title"] = "Login Page";
+	Layout = "_Layout";
+}
+<body>
+	<div class="menu">
+		<div class="container">
+			<div class="menu_box">
+				<ul class="megamenu skyblue">
+					@foreach (var cat in Model.Categories)
+					{
+						<li>
+							<a class="color10" asp-controller="Category" asp-action="Index" asp-route-catid="@cat.Id" style=" width:120px;text-align:center;">@cat.Name</a>
+							<div class="megapanel">
+								<div class="row">
+									@{
+										var integer = 0;
+										var count = Model.SubCategories.Where(x => x.CategoryId == cat.Id).Count();
+										double ans = count / 8;
+										ans = Math.Round(ans);
+										var catlist = Model.SubCategories.Where(x => x.CategoryId == cat.Id).ToArray();
+									}
+									@for (int i = 0; i < ans; i++)
+									{
+										<div class="col1">
+											<div class="h_nav">
+												<ul>
+													@for (int k = i * 8; k <= (i * 8 + 8) - 1; k++)
+													{
+														<li><a asp-controller="Category" asp-action="Index" asp-route-subcatid="@catlist[k].Id">@catlist[k].Name</a></li>
+													}
+												</ul>
+											</div>
+										</div>
+
+									}
+								</div>
+							</div>
+						</li>
+					}
+					<div class="clearfix"> </div>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="men">
+		<div class="container">
+			<div class="register">
+				<div class="col-md-6 login-left">
+					<h3>Новый пользователь</h3>
+					<p>Создав аккаунт вы сможете использовать все возможности сайта, такие как создание онлайн заказов,добавление лекарств в избранное.</p>
+					<a class="acount-btn" asp-controller="Account" asp-action="Register">Создать аккаунт</a>
+				</div>
+				<div class="col-md-6 login-right">
+					<h3>Авторизация</h3>
+					<p>Если у вас есть аккаунт, пожалуйста авторизуйтесь.</p>
+					<form method="post" asp-controller="Account" asp-action="Login">
+						<div>
+							<span>Номер телефона<label>*</label></span>
+							<input asp-for="Login" />
+							<span asp-validation-for="Login"></span>
+						</div>
+						<div>
+							<span>Пароль<label>*</label></span>
+							<input asp-for="Password" />
+							<span asp-validation-for="Password"></span>
+						</div>
+						<input type="submit" value="Войти">
+					</form>
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+		</div>
+	</div>
+	<div class="footer">
+		<div class="container">
+			<img src="images/pay.png" class="img-responsive" alt="" />
+			<ul class="footer_nav">
+				<li><a href="#">Home</a></li>
+				<li><a href="#">Blog</a></li>
+				<li><a href="#">Shop</a></li>
+				<li><a href="#">Media</a></li>
+				<li><a href="#">Features</a></li>
+				<li><a href="#">About Us</a></li>
+				<li><a href="contact.html">Contact Us</a></li>
+			</ul>
+			<p class="copy">Copyright&copy; 2015 Template by <a href="http://w3layouts.com" target="_blank"> w3layouts</a></p>
+		</div>
+	</div>
+</body>

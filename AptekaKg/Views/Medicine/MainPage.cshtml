@@ -1,0 +1,154 @@
+﻿@model AptekaKg.ViewModels.MainPageViewModel
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="Gifty Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+	<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+	<link href="~/css/bootstrap.css" rel='stylesheet' type='text/css' />
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<!-- Custom Theme files -->
+	<link href="css/style.css" rel='stylesheet' type='text/css' />
+	<!-- Custom Theme files -->
+	<!--webfont-->
+	<link href='http://fonts.googleapis.com/css?family=Raleway:100,200,300,400,500,600,700,800,900' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="~/js/jquery-1.11.1.min.js"></script>
+	<!-- dropdown -->
+	<script src="js/jquery.easydropdown.js"></script>
+	<!-- start menu -->
+	<link href="~/css/megamenu.css" rel="stylesheet" type="text/css" media="all" />
+	<script type="text/javascript" src="~/js/megamenu.js"></script>
+	<script>$(document).ready(function () { $(".megamenu").megamenu(); });</script>
+	<link rel="stylesheet" href="~/css/etalage.css">
+	<script src="~/js/jquery.etalage.min.js"></script>
+	<script>
+		jQuery(document).ready(function ($) {
+
+			$('#etalage').etalage({
+				thumb_image_width: 300,
+				thumb_image_height: 400,
+				source_image_width: 900,
+				source_image_height: 1200,
+				show_hint: true,
+				click_callback: function (image_anchor, instance_id) {
+					alert('Callback example:\nYou clicked on an image with the anchor: "' + image_anchor + '"\n(in Etalage instance: "' + instance_id + '")');
+				}
+			});
+
+		});
+	</script>
+</head>
+<body>
+	<div class="menu">
+		<div class="container">
+			<div class="menu_box">
+				<ul class="megamenu skyblue">
+					@foreach (var cat in Model.Categories)
+					{
+						<li>
+							<a class="color10" asp-controller="Category" asp-action="Index" asp-route-catid="@cat.Id" style=" width:120px;text-align:center;">@cat.Name</a>
+							<div class="megapanel">
+								<div class="row">
+									@{
+										var integer = 0;
+										var count = Model.SubCategories.Where(x => x.CategoryId == cat.Id).Count();
+										double ans = count / 8;
+										ans = Math.Round(ans);
+										var catlist = Model.SubCategories.Where(x => x.CategoryId == cat.Id).ToArray();
+									}
+									@for (int i = 0; i < ans; i++)
+									{
+										<div class="col1">
+											<div class="h_nav">
+												<ul>
+													@for (int k = i * 8; k <= (i * 8 + 8) - 1; k++)
+													{
+														<li><a asp-controller="Category" asp-action="Index" asp-route-subcatid="@catlist[k].Id">@catlist[k].Name</a></li>
+													}
+												</ul>
+											</div>
+										</div>
+
+									}
+								</div>
+							</div>
+						</li>
+					}
+					<div class="clearfix"> </div>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="men">
+		<div class="container">
+			<div class="single_top">
+				<div class="col-md-9 single_right">
+					<div class="grid images_3_of_2">
+						<ul id="etalage">
+							<li>
+								<a href="optionallink.html">
+									<img class="etalage_thumb_image" src="@Model.Medicine.ImageUrl" class="img-responsive" />
+									<img class="etalage_source_image" src="@Model.Medicine.ImageUrl" class="img-responsive" title="" />
+								</a>
+							</li>
+						</ul>
+						<div class="clearfix"></div>
+					</div>
+					<div class="desc1 span_3_of_2">
+						<h1>@Model.Medicine.Name</h1>
+						<h4>Категория:@Model.Medicine.Category.Name/@Model.Medicine.SubCategory.Name</h4>
+						@{
+							if (Model.Medicine.Available == true)
+							{
+								<h3>В наличии</h3>
+							}
+							else
+							{
+								<h3>Нет в наличии</h3>
+							}
+						}
+						<p class="m_5">@Model.Medicine.Price c</p>
+						<div class="btn_form">
+							<form method="post" asp-controller="Medicine" asp-action="Add" asp-route-medid="@Model.Medicine.Id">
+								<input type="submit" value="В корзину" title="">
+							</form>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+				<div class="col-md-3">
+					<h4 style="text-align:center">На сайт первоисточник:</h4>
+							<a style="margin-bottom:40px" href="@Model.Medicine.URL"><img src="@Model.Medicine.Franchise.ImageUrl" class="img-responsive" alt=""/></a>
+					<a style="margin-top:40px;text-align:center" href="https://2gis.kg/search/Бишкек,@Model.Medicine.Franchise.Name"><h4>Показать все аптеки</h4></a>
+					<label for="pharmacy">Выберите аптеку:</label>
+					<select id="pharmacy" name="pharmacy" style="width:200px">
+						@foreach (var ad in Model.Pharmacies.Where(x => x.FranchiseId == Model.Medicine.FranchiseId))
+						{
+							<option value="@ad.Address">@ad.Address</option>
+						}
+					</select>
+					<button style="margin-top:20px"onclick="redirectToPharmacy()">Найти аптеку по адресу</button>
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+			<div class="toogle">
+				@Html.Raw(Model.Medicine.Description)
+			</div>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+	function redirectToPharmacy() {
+		// Получаем элемент select
+		var pharmacySelect = document.getElementById("pharmacy");
+		// Получаем выбранное значение (URL аптеки)
+		var selectedUrl = pharmacySelect.options[pharmacySelect.selectedIndex].value;
+		// Переадресация на выбранный URL
+		window.location.href =''.concat('https://2gis.kg/search/Бишкек,',selectedUrl);
+	}
+</script>

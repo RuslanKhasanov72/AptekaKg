@@ -47,6 +47,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 	<script>$(document).ready(function () { $(".megamenu").megamenu(); });</script>
 	<link rel="stylesheet" href="~/css/etalage.css">
 	<script src="~/js/responsiveslides.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 	<script>
 		$(function () {
 			$("#slider").responsiveSlides({
@@ -70,7 +71,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 						<ul>
 							 @if (User.Identity.IsAuthenticated)
                         {
-							<li class="active"><a href="login.html">Аккаунт</a></li>
+							<li class="active"><a asp-controller="Account" asp-action="UserPage">Личный кабинет</a></li>
 								<li>
 									<form method="post" asp-controller="Account" asp-action="LogOff">
 									<input id="inputlog" type="submit" value="Выход" />
@@ -78,7 +79,6 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 									</li>
 						}
 						else{
-							<li><a href="wishlist.html">Wishlist</a></li>
 								<li><a asp-controller="Account" asp-action="Login">Логин</a></li>
 							<li><a asp-controller="Account" asp-action="Register">Регистрация</a></li>
 						}
@@ -103,8 +103,11 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 					</div>
 					<div class="header_bottom_right">
 						<div class="search">
-							<input type="text" value="Наименование лекарства" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Наименование лекарства';}">
-							<input type="submit" value="">
+							<form method="get" asp-controller="Home" asp-action="Index">
+								<input type="text" id="searchInput" name="query" placeholder="Наименование лекарства" autocomplete="off" autofill="off">
+								<input type="submit" value="">
+							</form>
+							<div id="searchResults"></div>
 						</div>
 						<ul class="bag">
 							<a asp-controller="Account" asp-action="Bascket"><i class="bag_left"> </i></a>
@@ -136,6 +139,67 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         </div>
     </footer>
     <script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+<script>
+	$(document).ready(function () {
+		$('#searchInput').on('keyup', function () {
+			let searchQuery = $(this).val();
+			let field = document.getElementById('searchResults');
+			$.post('@Url.Action("Search", "Home")',
+				{
+					searchValue: searchQuery
+				},
+				function (response) {
+					if (response == 1) {
+						$('#searchResults').slideUp();
+					}
+					if (response != null && response!=1) {
+						field.innerHTML = '';
+						for (let i = 0; i < response.length; i++) {
+							if (i == 0) {
+								$('#searchResults').append('<table cellspacing="1">');
+							}
+							$('#searchResults').append(
+								'<tr>'
+								+ '<td>'
+								+ '<img style="width:50px;height:50px" src="' + response[i].imageUrl + '">'
+								+ '<a href="/Medicine/MainPage/' + response[i].id + '">'
+								+ response[i].name
+								+ '</a>'
+								+ '</td>'
+								+ '</tr>');
+							if (i == response.length - 1) {
+								$('#searchResults').append('</table>');
+							}
+						}
+						$('#searchResults').slideDown();
+					}
+				}
+			)
+		})
+	})
+</script>
+<style>
+	#searchResults {
+		display: none;
+		position: absolute;
+		background-color: #fff;
+		border: 1px solid #ddd;
+		padding: 10px;
+		width: 395px;
+		z-index: 1000;
+	}
+
+		#searchResults div {
+			padding: 10px;
+			border-bottom: 1px solid #ddd;
+		}
+
+			#searchResults div:hover {
+				background-color: #f0f0f0;
+			}
+</style>

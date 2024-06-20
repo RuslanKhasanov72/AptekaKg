@@ -1,0 +1,182 @@
+﻿@model AptekaKg.ViewModels.MedicineEditViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<body>
+	<div class="menu">
+		<div class="container">
+			<div class="menu_box">
+				<ul class="megamenu skyblue">
+					@foreach (var cat in Model.Categories)
+					{
+						<li>
+							<a class="color10" asp-controller="Category" asp-action="Index" asp-route-catid="@cat.Id" style=" width:120px;text-align:center;">@cat.Name</a>
+							<div class="megapanel">
+								<div class="row">
+									@{
+										var integer = 0;
+										var count = Model.SubCategories.Where(x => x.CategoryId == cat.Id).Count();
+										double ans = count / 8;
+										ans = Math.Round(ans);
+										var catlist = Model.SubCategories.Where(x => x.CategoryId == cat.Id).ToArray();
+									}
+									@for (int i = 0; i < ans; i++)
+									{
+										<div class="col1">
+											<div class="h_nav">
+												<ul>
+													@for (int k = i * 8; k <= (i * 8 + 8) - 1; k++)
+													{
+														<li><a asp-controller="Category" asp-action="Index" asp-route-subcatid="@catlist[k].Id">@catlist[k].Name</a></li>
+													}
+												</ul>
+											</div>
+										</div>
+
+									}
+								</div>
+							</div>
+						</li>
+					}
+					<div class="clearfix"> </div>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="men">
+		<div class="container">
+			<div class="register">
+				<div class="form-container">
+					<div class="form-left">
+						<form id="medicineForm" method="post">
+							<div>
+								<span>Наименование</span>
+								<input asp-for="@Model.Medicine.Name" />
+								<span asp-validation-for="@Model.Medicine.Name"></span>
+							</div>
+							<div>
+								<span>Ссылка</span>
+								<input asp-for="@Model.Medicine.URL" />
+								<span asp-validation-for="@Model.Medicine.URL"></span>
+							</div>
+							<div>
+								<span>Цена</span>
+								<input asp-for="@Model.Medicine.Price" />
+								<span asp-validation-for="@Model.Medicine.Price"></span>
+							</div>
+							<div>
+								<span>Ссылка на картинку</span>
+								<input asp-for="@Model.Medicine.ImageUrl" />
+								<span asp-validation-for="@Model.Medicine.ImageUrl"></span>
+							</div>
+							<div>
+								<span>Категория</span>
+								@Html.DropDownListFor(Model => Model.Medicine.CategoryId, ViewBag.Category as SelectList, new { id = "CategoryDropdown" })
+							</div>
+							<div>
+								<span>Подкатегория</span>
+								@Html.DropDownListFor(Model => Model.Medicine.SubCategoryId, ViewBag.Subcategory as SelectList, new { id = "SubcategoryDropdown" })
+							</div>
+							<div>
+								<span>Франшиза</span>
+								@Html.DropDownListFor(Model => Model.Medicine.FranchiseId, ViewBag.Franchise as SelectList)
+							</div>
+							<div>
+								<input type="button" id="saveButton" value="Сохранить">
+							</div>
+						</form>
+					</div>
+					<div class="form-right">
+						<div>
+							<span>Описание</span>
+							<textarea style="width:700px; height:900px" asp-for="@Model.Medicine.Description"></textarea>
+							<span asp-validation-for="@Model.Medicine.Description"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="footer">
+		<div class="container">
+			<img src="images/pay.png" class="img-responsive" alt="" />
+			<ul class="footer_nav">
+				<li><a href="#">Home</a></li>
+				<li><a href="#">Blog</a></li>
+				<li><a href="#">Shop</a></li>
+				<li><a href="#">Media</a></li>
+				<li><a href="#">Features</a></li>
+				<li><a href="#">About Us</a></li>
+				<li><a href="contact.html">Contact Us</a></li>
+			</ul>
+			<p class="copy">Copyright&copy; 2015 Template by <a href="http://w3layouts.com" target="_blank"> w3layouts</a></p>
+		</div>
+	</div>
+</body>
+<style>
+	.form-container {
+		display: flex;
+	}
+
+	.form-left {
+		flex: 1;
+		margin-right: 20px;
+	}
+
+	.form-right {
+		flex: 1;
+	}
+
+		.form-left div,
+		.form-right div {
+			margin-bottom: 10px;
+		}
+
+	.register input[type="button"] {
+		display: block;
+		margin-top: 20px;
+	}
+</style>
+@section Scripts {
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('#CategoryDropdown').change(function () {
+				var selectedCategoryId = $(this).val();
+				$.ajax({
+					url: '@Url.Action("GetSubcategories", "Medicine")',
+					type: 'GET',
+					data: { categoryId: selectedCategoryId },
+					success: function (data) {
+						var subcategoryDropdown = $('#SubcategoryDropdown');
+						subcategoryDropdown.empty();
+						$.each(data, function (index, subcategory) {
+							subcategoryDropdown.append($('<option>', {
+								value: subcategory.id,
+								text: subcategory.name
+							}));
+						});
+					}
+				});
+			});
+
+			$('#saveButton').click(function () {
+				var form = $('#medicineForm');
+				console.log(form.serialize());
+				$.ajax({
+					url: '@Url.Action("EditMedicine", "Medicine")',
+					type: 'POST',
+					data: form.serialize(),
+					success: function (response) {
+						// Обработайте ответ от сервера
+						alert("Данные успешно сохранены!");
+					},
+					error: function (xhr, status, error) {
+						// Обработайте ошибку
+						alert("Произошла ошибка при сохранении данных.");
+					}
+				});
+			});
+		});
+	</script>
+}

@@ -7,7 +7,8 @@ public class Program
 {
     public static async System.Threading.Tasks.Task Main(string[] args)
     {
-        var host = CreateHostBuilder(args).Build();
+		AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+		var host = CreateHostBuilder(args).Build();
         using var scope = host.Services.CreateScope();
         var services = scope.ServiceProvider;
         try
@@ -15,7 +16,7 @@ public class Program
             var userManager = services.GetRequiredService<UserManager<User>>();
             var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             await AdminInitializer.SeedAdminUser(rolesManager, userManager);
-        }
+		}
         catch (Exception ex)
         {
             var logger = services.GetRequiredService<ILogger<Program>>();

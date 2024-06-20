@@ -2,6 +2,27 @@
 @{
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+	.right-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-trash {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+	.counter {
+		font-size: 1.5em;
+		width: 90px;
+		text-align: center;
+		margin: 0 10px;
+	}
+
+</style>
 <body>
 	<div class="menu">
 		<div class="container">
@@ -45,35 +66,45 @@
 	</div>
 	<div class="men">
 		<div class="container">
-			<div class="wishlist">
-				@if (@Model.Medicines.ToList().Count == 0)
+			<div class="wishlist" id="wishlistdiv">
+				@if (@Model.Baskets.ToList().Count == 0)
 				{
 				<h4 class="title">Shopping cart is empty</h4>
-					<p class="cart">You have no items in your shopping cart.<br>Click<a href="index.html"> here</a> to continue shopping</p>
+					<p class="cart">You have no items in your shopping cart.<br>Click<a asp-controller="Home" asp-action="Index"> here</a> to continue shopping</p>
 				}
 				else
 				{
 					<div class="col-md-8">
-					@foreach(var med in Model.Medicines)
+					@foreach(var med in Model.Baskets)
 					{
-						<div class="a-top">
-							<div class="left-grid">
-								<img src="@med.ImageUrl" class="img-responsive" alt="" />
+							<div class="a-top" id="line-@med.Medicine.Id" style="display: flex; align-items: center;">
+								<div class="left-grid">
+									<img src="@med.Medicine.ImageUrl" class="img-responsive" alt="" />
+								</div>
+								<div class="right-grid" style="margin-left: 10px;">
+									<div style="display: flex; align-items: center;">
+										<h3 style="margin-right: 10px;">@med.Medicine.Name</h3>
+										<input type="number" id="counter-@med.Medicine.Id" class="counter" value="@med.Count" min="1" onchange="countupdate(@med.Medicine.Id)" style="width: 50px;">
+									</div>
+									<div class="price-trash">
+										<h5>@med.Medicine.Price c</h5>
+										<input type="hidden" name="hiddenprice" value="@ViewBag.Price" />
+										<input type="hidden" id="medprice-@med.Medicine.Id" name="hiddenprice" value="@med.Medicine.Price" />
+										<i class="fa-solid fa-trash delete" id="@med.Medicine.Id" type="submit" style="color:tomato"></i>
+									</div>
+								</div>
+								<div class="clearfix"></div>
 							</div>
-							<div class="right-grid">
-								<h3>@med.Name</h3>
-								<h5>@med.Price c</h5>
-							</div>
-							<div class="clearfix"></div>
-						</div>
 					}
 					<div class="clearfix"></div>
 					</div>
+					<h3 id="finalprice">Цена:@ViewBag.Price c</h3>
+					<form method="post" asp-controller="Account" asp-action="Buy" id="buyForm">
+						<input type="hidden" name="hiddenprice" id="hiddenPrice" value="@ViewBag.Price" />
+						<input type="hidden" id="routePrice" name="routePrice" />
+						<button class="acount-btn" type="submit" onclick="setRoutePrice()">Купить</button>
+					</form>
 				}
-				<h3>Цена:@ViewBag.Price c</h3>
-				<form method="post" asp-controller="Account" asp-action="Buy" asp-route-price="@ViewBag.Price">
-					<button class="acount-btn"><input class="acount-btn" id="inputlog" type="submit" value="Купить" /></button>
-				</form>
 			</div>
 		</div>
 	</div>
@@ -92,4 +123,81 @@
 			<p class="copy">Copyright&copy; 2015 Template by <a href="http://w3layouts.com" target="_blank"> w3layouts</a></p>
 		</div>
 	</div>
+	<script>
+		$(document).ready(function () {
+			$('.delete').on('click', function () {
+				let medicid = this.id;
+				$.post('@Url.Action("DeleteBascket", "Account")',
+					{
+						medid: medicid
+					},
+					function (response) {
+						if (response[0] == "Success") {
+							$(`#line-${medicid}`).remove()
+							calculateTotal()
+
+							if (response[1] == 0) {
+								let wishfield = document.getElementById('wishlistdiv');
+								wishfield.innerHTML = '';
+							}
+						}
+					}
+				)
+			})
+		})
+
+		function setRoutePrice() {
+			var hiddenPriceValue = document.getElementById('hiddenPrice').value;
+			document.getElementById('routePrice').value = hiddenPriceValue;
+
+			// Add the hidden price to the form's action as a route value
+			var form = document.getElementById('buyForm');
+			var action = form.getAttribute('action');
+			form.setAttribute('action', action + '?price=' + hiddenPriceValue);
+		}
+
+		function countupdate(counterpressid) {
+			let medicid = counterpressid;
+			let countnumber = document.getElementById('counter-' + counterpressid).value;
+			$.post('@Url.Action("UpdateCountBascket", "Account")',
+				{
+					medid: medicid,
+					count: countnumber
+				},
+				function (response) {
+					if (response[0] == "Success") {
+
+					}
+				}
+			)
+			calculateTotal();
+		}
+
+		function calculateTotal() {
+			var total = 0;
+
+			// Получаем все элементы с классом counter
+			var counters = document.getElementsByClassName('counter');
+			console.log(counters);
+			// Проходимся по каждому элементу счетчика и обновляем общую сумму
+			for (var i = 0; i < counters.length; i++) {
+				var id = counters[i].id.split('-')[1];
+				console.log(id);// Получаем Id лекарства
+				var count = parseInt(counters[i].value);
+				console.log(count);// Получаем текущее значение счетчика
+				var price = parseInt(document.getElementById('medprice-' + id).value);
+				console.log(price);// Получаем цену
+
+				// Умножаем цену на количество и добавляем к общей сумме
+				total += count * price;
+			}
+
+				// Выводим общую сумму на страницу
+				 // Округляем до двух знаков после запятой
+			let pricefield = document.getElementById('finalprice');
+			pricefield.textContent = 'Цена: ' + total.toFixed(0) + ' c';
+			let pricefieldhide = document.getElementById('hiddenPrice');
+			pricefieldhide.value = total.toFixed(0);
+		}
+	</script>
 </body>

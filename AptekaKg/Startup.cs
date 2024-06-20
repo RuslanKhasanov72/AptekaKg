@@ -1,4 +1,5 @@
 ﻿using AptekaKg.Models;
+using AptekaKg.utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,10 +23,11 @@ namespace AptekaKg
             services.AddDbContext<UsersContext>(options => options.UseNpgsql(connection))
                .AddIdentity<User, IdentityRole>()
                .AddEntityFrameworkStores<UsersContext>();
-        }
+			services.AddScoped<DataMigrationService>();
+		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataMigrationService migrationService)
         {
             if (env.IsDevelopment())
             {
@@ -51,6 +53,7 @@ namespace AptekaKg
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-        }
+			migrationService.MigrateData();
+		}
     }
 }

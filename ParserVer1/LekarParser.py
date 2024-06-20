@@ -27,7 +27,7 @@ while 1:
         break
     if elem.text=="Показать ещё":
         elem.click()
-        time.sleep(2)
+        time.sleep(3)
 
 Base = automap_base()
 engine = create_engine("postgresql://postgres:qwerty@localhost:5432/Apteka")

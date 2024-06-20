@@ -112,9 +112,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 						}
 						<p class="m_5">@Model.Medicine.Price c</p>
 						<div class="btn_form">
-							<form method="post" asp-controller="Medicine" asp-action="Add" asp-route-medid="@Model.Medicine.Id">
-								<input type="submit" value="В корзину" title="">
-							</form>
+								<input id="addmed" type="submit" value="В корзину" title="">
+							<a asp-controller="Medicine" asp-action="Edit" asp-route-id="@Model.Medicine.Id" asp-route-categoryid="@Model.Medicine.Category.Id">Редактировать</a>
 						</div>
 					</div>
 					<div class="clearfix"></div>
@@ -151,4 +150,21 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 		// Переадресация на выбранный URL
 		window.location.href =''.concat('https://2gis.kg/search/Бишкек,',selectedUrl);
 	}
+
+	$(document).ready(function () {
+		$('#addmed').on('click', function () {
+			let medicinid = @Model.Medicine.Id;
+			$.post('@Url.Action("Add", "Medicine")',
+				{
+					medid: medicinid
+				},
+				function (response) {
+					if (response == "Success") {
+						
+					}
+				}
+			)
+		})
+	})
+
 </script>

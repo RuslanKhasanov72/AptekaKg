@@ -1,0 +1,296 @@
+﻿@model AptekaKg.ViewModels.UserPageViewModel
+@{
+	ViewData["Title"] = "User Page";
+	Layout = "_Layout";
+}
+<body>
+	<div class="menu">
+		<div class="container">
+			<div class="menu_box">
+				<ul class="megamenu skyblue">
+					@foreach (var cat in Model.Categories)
+					{
+						<li>
+							<a class="color10" asp-controller="Category" asp-action="Index" asp-route-catid="@cat.Id" style=" width:120px;text-align:center;">@cat.Name</a>
+							<div class="megapanel">
+								<div class="row">
+									@{
+										var integer = 0;
+										var count = Model.SubCategories.Where(x => x.CategoryId == cat.Id).Count();
+										double ans = count / 8;
+										ans = Math.Round(ans);
+										var catlist = Model.SubCategories.Where(x => x.CategoryId == cat.Id).ToArray();
+									}
+									@for (int i = 0; i < ans; i++)
+									{
+										<div class="col1">
+											<div class="h_nav">
+												<ul>
+													@for (int k = i * 8; k <= (i * 8 + 8) - 1; k++)
+													{
+														<li><a asp-controller="Category" asp-action="Index" asp-route-subcatid="@catlist[k].Id">@catlist[k].Name</a></li>
+													}
+												</ul>
+											</div>
+										</div>
+
+									}
+								</div>
+							</div>
+						</li>
+					}
+					<div class="clearfix"> </div>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="men">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="register">
+                            <div class="register-top-grid">
+                                <h3>Введите данные:</h3>
+                                <div>
+                                    <span>Номер телефона</span>
+                                    <input id="numberinput" asp-for="@Model.User.UserName">
+                                    <span asp-validation-for="@Model.User.UserName"></span>
+                                </div>
+                                <div>
+                                    <span>Адрес</span>
+                                    <input id="adressinput" asp-for="@Model.User.Adress">
+                                    <span asp-validation-for="@Model.User.Adress"></span>
+                                </div>
+                                <div>
+                                    <span>Email</span>
+                                    <input id="emailinput" asp-for="@Model.User.Email">
+                                    <span asp-validation-for="@Model.User.Email"></span>
+                                </div>
+                                <div class="clearfix"> </div>
+                                <a class="news-letter" href="#">
+                                </a>
+                            </div>
+                            <div class="clearfix"> </div>
+                            <div class="register-but">
+                                <input class="account-btn" type="submit" id="editinputbtn" value="Сохранить">
+                                <div class="clearfix"> </div>
+                            </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3>Список заказов</h3>
+                    <div class="date-range">
+                        <div>
+                            <span>Дата от</span>
+                            <input type="date" id="date-from">
+                        </div>
+                        <div>
+                            <span>Дата до</span>
+                            <input type="date" id="date-to">
+                        </div>
+                        <div>
+                           <button onclick="changeDate()">Применить</button>
+                        </div>
+                    </div>
+                    <div class="med-container">
+                        <ul class="med-list">
+                            @foreach (var orderl in Model.OrderList)
+                            {
+                                <li>
+                                    <ul>
+                                    @foreach(var order in orderl)
+                                    {
+                                        <li>
+                                            <p>@order.Medicine.Name @order.Count Шт.</p>
+                                        </li>
+                                    }  
+                                    </ul>
+                                    <div class="button-container">
+                                        <h5>Цена: @orderl[0].Price c</h5>
+                                        <button class="button-right" onclick="orderagain(@orderl[0].NumberOfOrder)">Повторить заказ</button>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+	</div>
+	<div class="footer">
+		<div class="container">
+			<img src="images/pay.png" class="img-responsive" alt="" />
+			<ul class="footer_nav">
+				<li><a href="#">Home</a></li>
+				<li><a href="#">Blog</a></li>
+				<li><a href="#">Shop</a></li>
+				<li><a href="#">Media</a></li>
+				<li><a href="#">Features</a></li>
+				<li><a href="#">About Us</a></li>
+				<li><a href="contact.html">Contact Us</a></li>
+			</ul>
+			<p class="copy">Copyright&copy; 2015 Template by <a href="http://w3layouts.com" target="_blank"> w3layouts</a></p>
+		</div>
+	</div>
+</body>
+<script>
+    $(document).ready(function () {
+        $('#editinputbtn').on('click', function () {
+            let number = document.getElementById('numberinput').value;
+            let adress = document.getElementById('adressinput').value;
+            let email = document.getElementById('emailinput').value;
+            $.post('@Url.Action("UpdateUser", "Account")',
+                {
+                    numberuser: number,
+                    adressuser: adress,
+                    emailuser: email,
+                },
+                function (response) {
+                    if (response == "Success") {
+
+                    }
+                }
+            )
+        })
+    })
+
+    function orderagain(numberorder) {
+        $.post('@Url.Action("BuyAgain", "Account")',
+            {
+                ordernumber: numberorder
+            },
+            function (response) {
+                if (response == "Success") {
+
+                }
+            }
+        )
+    }
+    function changeDate() {
+        var datefrom = document.getElementById('date-from').value;
+        var dateto= document.getElementById('date-to').value;
+        $.post('@Url.Action("SortByDate", "Account")',
+            {
+                datefrom: datefrom,
+                dateto: dateto
+            },
+            function (response) {
+                if (response.length > 0) {
+                    $(`.med-list`).remove()
+                    $('.med-container').append(
+                        '<ul class="med-list" ></ul>'
+                    )
+                    var total = 0;
+                    response.forEach(orderGroup => {
+                        $('.med-list').append(
+                            '<li class="linum-' + total + '">'
+                            + '<ul class="ulnum-' + total + '">'
+                        );
+                        orderGroup.forEach(order => {
+                            $('.ulnum-' + total).append(
+                                '<li>'
+                                + order.medicine.name + ' ' + order.count + ' Шт.'
+                                + '</li>'
+                            );
+                        });
+                        $('.linum-' + total).append(
+                            '</ul>'
+                            + '<div class="button-container">'
+                            + '<h5> Цена: ' + orderGroup[0].price + ' c</h5>'
+                            + '<button class="button-right" onclick ="orderagain(' + orderGroup[0].numberOfOrder + ')"> Повторить заказ </button>'
+                            + '</div>'
+                            + '</li>'
+                        );
+                        total++;
+                    });
+
+                }
+                else {
+                    swal("", "За данный период заказов не найдено", "info");
+                }
+            }
+        )
+    }
+</script>
+<style>
+
+    .register-top-grid h3,
+    .med-container h3 {
+        margin-bottom: 20px;
+    }
+
+    .register-top-grid div,
+    .date-range div {
+        margin-bottom: 10px;
+    }
+
+    .med-container {
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 20px;
+    }
+
+    .date-range {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .med-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .med-list > li {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+            .med-list > li > ul {
+                list-style-type: disc;
+                padding-left: 20px;
+            }
+
+                .med-list > li > ul > li {
+                    margin: 5px 0;
+                    padding: 5px;
+                    background-color: #e9e9e9;
+                    border-radius: 3px;
+                }
+
+    .account-btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+    }
+
+        .account-btn:hover {
+            background-color: #45a049;
+        }
+
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+        .button-container button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+
+    .button-right {
+        background-color: #28A745;
+        color: white;
+    }
+</style>

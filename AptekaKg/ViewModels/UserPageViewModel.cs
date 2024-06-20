@@ -2,12 +2,12 @@
 
 namespace AptekaKg.ViewModels
 {
-	public class BacsketViewModel
+	public class UserPageViewModel
 	{
+
 		public IEnumerable<Category> Categories { get; set; }
 		public IEnumerable<SubCategory> SubCategories { get; set; }
-		public IEnumerable<Medicine> Medicines { get; set; }
-		public IEnumerable<Basket> Baskets { get; set; }
+		public User User { get; set; }
+		public IEnumerable<List<Order>> OrderList { get; set; }
 	}
 }
-

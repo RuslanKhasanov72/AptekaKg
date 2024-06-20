@@ -1,6 +1,7 @@
 ﻿using AptekaKg.Models;
 using AptekaKg.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
 namespace AptekaKg.Controllers
@@ -40,11 +41,41 @@ namespace AptekaKg.Controllers
 			Basket basket = new Basket()
 			{
 				UserId = UserId,
-				MedicineId = medid
+				MedicineId = medid,
+				Count = 1
 			};
 			_db.Baskets.Add(basket);
 			_db.SaveChanges();
 			return Redirect("~/Medicine/MainPage/"+medid);
+		}
+		public IActionResult Edit(int id,int categoryid) { 
+			Medicine medicine = _db.Medicines.FirstOrDefault(m => m.Id == id);
+            var categorylist = _db.Categories.ToList();
+            var subcategory = _db.SubCategories.ToList();
+			ViewBag.Category= new SelectList(_db.Categories, "Id", "Name");
+			ViewBag.Subcategory= new SelectList(_db.SubCategories.Where(s=>s.CategoryId==categoryid), "Id", "Name");
+			ViewBag.Franchise= new SelectList(_db.Franchises, "Id", "Name");
+			MedicineEditViewModel viewModel = new MedicineEditViewModel
+            {
+                Medicine = medicine,
+                Categories = categorylist,
+                SubCategories = subcategory
+            };
+            return View(viewModel);
+		}
+		[HttpGet]
+		public JsonResult GetSubcategories(int categoryId)
+		{
+			var subcategories = _db.SubCategories.Where(s=>s.CategoryId==categoryId);
+			return Json(subcategories);
+		}
+		[HttpPost]
+		public async Task<JsonResult> EditMedicine(Medicine medicine)
+		{
+			var categorylist = _db.Categories.ToList();
+			var subcategory = _db.SubCategories.ToList();
+			var franchises = _db.Franchises.ToList();
+			return Json("Success");
 		}
 	}
 }

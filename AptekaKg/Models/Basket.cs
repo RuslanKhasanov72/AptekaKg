@@ -7,5 +7,6 @@
 		public string UserId { get; set; }
 		public Medicine Medicine { get; set; }
 		public int MedicineId { get; set; }
+		public int Count { get; set; }
 	}
 }
